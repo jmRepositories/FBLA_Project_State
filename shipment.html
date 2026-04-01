@@ -1,1 +1,316 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Drawing Game</title>
+
+<style>
+  body {
+    text-align: center;
+    font-family: Arial;
+    background: #f4f4f4;
+  }
+
+  canvas {
+    border: 2px solid black;
+    background: white;
+    cursor: crosshair;
+  }
+
+  #score, #timer, #level {
+    font-size: 20px;
+    margin: 10px;
+  }
+
+  button {
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<div id="level">Level: 1</div>
+<div id="score">Score: 0</div>
+<div id="timer">Time: 60</div>
+
+<canvas id="canvas" width="500" height="400"></canvas><br>
+<button onclick="clearCanvas()">Restart</button>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let drawing = false;
+let lines = [];
+let currentLine = [];
+let lastPoint = null;
+let collisionDetected = false;
+
+let score = 0;
+let usedPoints = new Set();
+
+let startPoints = [];
+let activeColor = "black";
+let startPointRef = null;
+
+let pairCount = 3;
+let level = 1;
+
+// 🎨 Color generator
+let hue = 0;
+function getUniqueColor() {
+  const color = `hsl(${hue}, 100%, 50%)`;
+  hue = (hue + 60) % 360;
+  return color;
+}
+
+// 🟢 Generate paired points
+function generateStartPoints(pairCount) {
+  const points = [];
+  const minDist = 50;
+
+  function isValid(p) {
+    for (let other of points) {
+      const dx = p.x - other.x;
+      const dy = p.y - other.y;
+      if (Math.sqrt(dx * dx + dy * dy) < minDist) return false;
+    }
+    return true;
+  }
+
+  for (let i = 0; i < pairCount; i++) {
+    const color = getUniqueColor();
+    let p1, p2;
+
+    do {
+      p1 = {
+        x: Math.random() * (canvas.width - 40) + 20,
+        y: Math.random() * (canvas.height - 40) + 20,
+        color
+      };
+    } while (!isValid(p1));
+    points.push(p1);
+
+    do {
+      p2 = {
+        x: Math.random() * (canvas.width - 40) + 20,
+        y: Math.random() * (canvas.height - 40) + 20,
+        color
+      };
+    } while (!isValid(p2));
+    points.push(p2);
+  }
+  return points;
+}
+
+// 🔴 Draw points
+function drawStartPoints() {
+  for (let p of startPoints) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  }
+}
+
+// 🧠 Detect point
+function getStartPoint(x, y) {
+  const threshold = 10;
+  for (let p of startPoints) {
+    const dx = p.x - x;
+    const dy = p.y - y;
+    if (Math.sqrt(dx * dx + dy * dy) < threshold) return p;
+  }
+  return null;
+}
+
+// 🎯 Score
+function updateScore(points) {
+  score += points;
+  document.getElementById("score").innerText = "Score: " + score;
+}
+
+// 🏁 Check win
+function checkWin() {
+  if (usedPoints.size === startPoints.length) {
+    setTimeout(() => {
+      alert("🎉 Level Complete!");
+      nextLevel();
+    }, 100);
+  }
+}
+
+// ⏱️ Timer
+let timeLeft = 60;
+let timerInterval;
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 60;
+  document.getElementById("timer").innerText = "Time: " + timeLeft;
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").innerText = "Time: " + timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      alert("⏰ Time's up!");
+    }
+  }, 1000);
+}
+
+// 🖱️ Start drawing
+canvas.addEventListener("mousedown", (e) => {
+  if (timeLeft <= 0) return;
+
+  const startPoint = getStartPoint(e.offsetX, e.offsetY);
+  if (!startPoint) return;
+
+  startPointRef = startPoint;
+  drawing = true;
+  collisionDetected = false;
+
+  ctx.beginPath();
+  ctx.moveTo(startPoint.x, startPoint.y);
+
+  currentLine = [];
+  lastPoint = { x: startPoint.x, y: startPoint.y };
+
+  activeColor = startPoint.color;
+  ctx.strokeStyle = activeColor;
+});
+
+// ✏️ Drawing
+canvas.addEventListener("mousemove", (e) => {
+  if (!drawing || timeLeft <= 0) return;
+
+  const newPoint = { x: e.offsetX, y: e.offsetY };
+  const segment = { p1: lastPoint, p2: newPoint };
+
+  currentLine.push(segment);
+  checkCollision(segment);
+
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+
+  ctx.lineTo(newPoint.x, newPoint.y);
+  ctx.stroke();
+
+  lastPoint = newPoint;
+});
+
+// 🧼 End drawing (FIXED to mark both points used)
+canvas.addEventListener("mouseup", (e) => {
+  if (!drawing) return;
+
+  drawing = false;
+  ctx.beginPath();
+
+  const endPoint = getStartPoint(e.offsetX, e.offsetY);
+
+  if (!endPoint || endPoint === startPointRef || endPoint.color !== startPointRef.color) {
+    redrawCanvas();
+    startPointRef = null;
+    return;
+  }
+
+  lines.push({
+    segments: currentLine,
+    color: activeColor
+  });
+
+  // ✅ mark BOTH start and end points as used
+  usedPoints.add(`${startPointRef.x},${startPointRef.y}`);
+  usedPoints.add(`${endPoint.x},${endPoint.y}`);
+
+  updateScore(10);
+
+  startPointRef = null;
+
+  checkWin(); // now triggers correctly
+});
+
+// 💥 Collision
+function checkCollision(newSeg) {
+  if (collisionDetected) return;
+  for (let line of lines) {
+    for (let seg of line.segments) {
+      if (segmentsIntersect(newSeg, seg)) {
+        collisionDetected = true;
+        alert("⚡ Lines touched!");
+        return;
+      }
+    }
+  }
+}
+
+// 📐 Math
+function segmentsIntersect(s1, s2) {
+  const A = s1.p1, B = s1.p2;
+  const C = s2.p1, D = s2.p2;
+  function ccw(P, Q, R) {
+    return (R.y - P.y) * (Q.x - P.x) > (Q.y - P.y) * (R.x - P.x);
+  }
+  return (ccw(A, C, D) !== ccw(B, C, D) && ccw(A, B, C) !== ccw(A, B, D));
+}
+
+// 🔁 Redraw
+function redrawCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let line of lines) {
+    ctx.beginPath();
+    ctx.strokeStyle = line.color;
+    for (let seg of line.segments) {
+      ctx.moveTo(seg.p1.x, seg.p1.y);
+      ctx.lineTo(seg.p2.x, seg.p2.y);
+    }
+    ctx.stroke();
+  }
+  drawStartPoints();
+}
+
+// ⬆️ Next level
+function nextLevel() {
+  pairCount++;
+  level++;
+  document.getElementById("level").innerText = "Level: " + level;
+
+  lines = [];
+  usedPoints.clear();
+  hue = 0;
+
+  startPoints = generateStartPoints(pairCount);
+  redrawCanvas();
+  startTimer();
+}
+
+// 🔄 Restart
+function clearCanvas() {
+  pairCount = 3;
+  level = 1;
+  document.getElementById("level").innerText = "Level: 1";
+
+  lines = [];
+  usedPoints.clear();
+  score = 0;
+  updateScore(0);
+
+  hue = 0;
+  startPoints = generateStartPoints(pairCount);
+  redrawCanvas();
+  startTimer();
+}
+
+// 🟢 Init
+startPoints = generateStartPoints(pairCount);
+drawStartPoints();
+startTimer();
+</script>
+
+</body>
+</html>
