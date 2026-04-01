@@ -1,637 +1,230 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        *{
-            box-sizing: border-box;}
-        html,body{
-            margin: 0; 
-            padding: 0;
-            height: 100%;
-            overflow: hidden;}
-        #container{
-            display: grid;
-            grid-template-rows: repeat(7, 1fr);
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            border: 3px solid gray;
-            height: inherit;
-            background: 
-        linear-gradient(180deg, #a0a0a0, #7d7d7d),
-        repeating-linear-gradient(
-            45deg,
-            rgba(255,255,255,0.05) 0px,
-            rgba(255,255,255,0.05) 2px,
-            transparent 2px,
-            transparent 6px
-        );}
-        
-        #header{
-            width: 100%;
-            height: 60%;
-            border: 3px solid black;
-            background-color: cornflowerblue;
-            grid-column: 1/3;
-            grid-row: 1/1;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-        opacity: 100;}
-        #header img {
-            max-height: 100%;
-            max-width: 100px;
-            object-fit: contain;}
-        #LeftSide{
-            /* border: 3px solid red; */
-            grid-column: 1/2;
-            grid-row: 2/7;
-            display: flex;}
-        #chuteContainer{
-            width: 100%;
-            /* border: 3px solid black; */
-            display: flex;
-            justify-content: space-around;
-            align-items: center;}
-        li{
-            list-style-type:none;}
-        #chute {
-            width: 40%;
-            height: 40%;
+<meta charset="UTF-8">
+<title>Drawing Game</title>
 
-            background: repeating-linear-gradient(
-                45deg,
-                var(--color1, red),
-                var(--color1, red) 10px,
-                transparent 10px,
-                transparent 20px,
-                var(--color2, blue),
-                var(--color2, blue) 30px,
-                transparent 30px,
-                transparent 40px
-            );
+<style>
+  body {
+    text-align: center;
+    font-family: Arial;
+    background: #f4f4f4;
+  }
 
-            background-color: gray;
-        }
-        #flap {
-            width: 100%;
-            height: 100%;
-            background: repeating-linear-gradient(
-                
-                #444 0px,
-                #444 40px,
-                #666 40px,
-                #666 80px
-                );
-            transform-origin: top;
-            transform: scaleY(1); /* always ends open */
-        }
-        #flap.closing {
-            animation: flapClose 0.15s forwards;
-        }
-        #flap.opening {
-            animation: flapOpen 0.15s forwards;
-        }
-        #ButtonListLeft ul,
-        #ButtonListRight ul {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+  canvas {
+    border: 2px solid black;
+    background: white;
+    cursor: crosshair;
+  }
 
-            height: max-content;          /* controls square size */
-            width: 100%;
+  #score {
+    font-size: 20px;
+    margin: 10px;
+  }
 
-            background: #ccc;       /* gray background */
-            border-radius: 10px;    /* optional: rounded corners */
-
-            padding: 20px;
-            margin: 0;
-            gap: 40px;              /* spacing between buttons */}
-        #ButtonListLeft ul,
-        #ButtonListRight ul {
-            gap: 50px;}
-        #RightSide{
-            /* border: 3px solid orange; */
-            grid-column: 2/3;
-            grid-row: 2/7;
-            display: grid;
-            grid-template-columns: 1fr, 1fr;
-            grid-template-rows: repeat(3, 1fr);}
-        #earnings{
-            /* border: 3px solid black; */
-            grid-row: 1/3;
-            grid-column: 1/3;}
-        #PickUp{
-            width: 100%;
-            /* border: 3px solid black; */
-            grid-row: 3/3;
-            grid-column: 1/3;
-            display: grid;
-            grid-template-rows: repeat(9, 1fr);
-            grid-template-columns: repeat(9, 1fr);}
-        #piecesContainer{
-            width: 100%;
-            /* border:3px solid purple; */
-            grid-column: 1/10;
-            grid-row: 1/8;
-            display: flex;
-            justify-content: flex-end;
-            flex-direction: row;
-            align-items: center;
-            gap: 10px;
-            position: relative;}
-        .piece{
-            border: 3px solid brown;
-            width: 50%;}
-        #TerminalBar{
-            /* border: 3px solid black; */
-            grid-row: 7/7;
-            grid-column: 1/3;
-            align-items: center;
-            display: flex;
-            justify-content: center;}
-        #terminal{
-            border:5px solid greenyellow;
-            background-color: black;
-            color: greenyellow;
-            width: 60%;
-            height: 60%;
-            text-align: center;}
-        /* #terminal > ul li{
-            font-size: 120%;
-            font-weight:900;
-            transform: scaleX(20)} */
-        #terminalPage{
-            position: absolute;
-            width: 60%;
-            height: 60%;
-            align-self: center;
-            justify-self: center;
-            border: 10px solid greenyellow;
-            color: greenyellow;
-            background-color: black;
-            z-index: 2;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            display: none;}
-        #terminalPage table tr td h3{
-            color: greenyellow;
-            font-size: 2rem;}
-        #terminalPage table tr td hr{
-            height: 5px;
-            box-shadow: none;
-            background-color: greenyellow;
-            margin: 20px auto;}
-        #terminalPage table tr td p{
-            color: greenyellow;
-            font-size: 1rem;}
-        .box {
-            width: 150px;
-            height: 120px;
-            background: linear-gradient(145deg, #d2a679, #b5835a);
-            border: 2px solid #8b5a2b;
-            border-radius: 6px;
-            box-shadow: 
-                0 8px 15px rgba(0,0,0,0.2),
-                inset 0 2px 5px rgba(255,255,255,0.2),
-                inset 0 -3px 6px rgba(0,0,0,0.2);
-            overflow: visible;}
-            .box::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: repeating-linear-gradient(
-                45deg,
-                rgba(0,0,0,0.03) 0px,
-                rgba(0,0,0,0.03) 2px,
-                transparent 2px,
-                transparent 6px
-            );
-            pointer-events: none;}
-            .content {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;}
-        .flat-btn {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
-
-            /* Use custom colors */
-            background: var(--btn-color, #e53935);
-            box-shadow: 0 0 0 4px var(--btn-ring, #b71c1c);
-
-            transition: all 0.15s ease;}
-            .flat-btn:hover {
-            filter: brightness(1.15);}
-            .flat-btn:active {
-            filter: brightness(0.85);}
-            .conveyor {
-                width: 100%;
-                height: 80px;
-                overflow: hidden;
-                border: 2px solid #333;
-                background: #222;
-                position: relative;}
-            .belt {
-                width: 200%;
-                height: 100%;
-                background: repeating-linear-gradient(
-                90deg,
-                #444 0px,
-                #444 40px,
-                #666 40px,
-                #666 80px
-                );
-                animation: moveBelt 1s linear infinite;}
-            .conveyorItem {
-                position: relative;
-                /* top: 50%;
-                transform: translateY(-50%); */}
-            .normal{
-                border: 3px solid red;}
-            .express{
-                border: 3px solid yellow;}
-            .boat{
-                border: 3px solid orange;}
-            .large{
-                background-color: purple;}
-            .medium{
-                background-color: lightblue;}
-            .small{
-                background-color: teal;}
-            @keyframes moveBelt {
-                from {
-                transform: translateX(0);
-                }
-                to {
-                transform: translateX(-80px);
-                }
-            }
-            @keyframes flapClose {
-                from { transform: scaleY(0); }
-                to   { transform: scaleY(1); }
-            }
-
-            @keyframes flapOpen {
-                from { transform: scaleY(1); }
-                to   { transform: scaleY(0); }
-            }
-    </style>
+  button {
+    padding: 8px 12px;
+    margin: 5px;
+    cursor: pointer;
+  }
+</style>
 </head>
+
 <body>
-    <div id="container">
-        <div id="header">
-            <img src="https://cdn.pixabay.com/photo/2014/04/03/00/38/house-308936_1280.png" alt="Home_page"> <h2>Amazook</h2><p>Current game: <span>...</span></p>
-        </div>
-        <div id="terminalPage">
-            <table width="100%" height="400" cellpadding="10" cellspacing="0" style="border-bottom: 3px solid greenyellow;">
-                <tr>
-                    <td width="33%" valign="top">
-                        <h3>[ Box 1 ]</h3>
-                        <hr>
-                        <p id="size1" style="color: greenyellow;"></p>
-                        <p id="type1"></p>
-                    </td>
-        
-                    <td width="33%" valign="top">
-                        <h3>[ Box 2 ]</h3>
-                        <hr>
-                        <p id="size2"></p>
-                        <p id="type2"></p>
-                    </td>
-        
-                    <td width="33%" valign="top">
-                        <h3>[ Box 3 ]</h3>
-                        <hr>
-                        <p id="size3"></p>
-                        <p id="type3"></p>
-                    </td>
-                </tr>
-            </table>
-            <ul>
-                <li>Red - Normal</li>
-                <li>Yellow - Express</li>
-                <li>Orange - Boat</li>
-                <li>Purple - Large</li>
-                <li>LightBlue - Medium</li>
-                <li>Teal - Small</li>
-            </ul>
-        </div>
-        <div id="LeftSide">
-        <div id="chuteContainer">
-            <div id="ButtonListLeft">
-                <ul>
-                    <li>
-                        <button class="flat-btn" style="--btn-color:red; --btn-ring:rgb(154, 0, 0);" data-color="red"></button>
-                    </li>
-                    <li>
-                        <button class="flat-btn" style="--btn-color:yellow; --btn-ring:rgb(153, 153, 0);" data-color="yellow"></button>
-                    </li>
-                    <li>
-                        <button class="flat-btn" style="--btn-color:orange; --btn-ring:rgb(168, 109, 0);" data-color="orange"></button>
-                    </li>
-                </ul>
-            </div>
-            <div id="chute" style="border: 3px solid black;">
-                <div id="flap"></div>
-            </div>
-            <div id="ButtonListRight">
-                <ul>
-                    <li>
-                        <button class="flat-btn" style="--btn-color:purple; --btn-ring:rgb(183, 0, 183);" data-color="purple"></button>
-                    </li>
-                    <li>
-                        <button class="flat-btn" style="--btn-color:lightblue; --btn-ring:rgb(115, 144, 154);" data-color="lightblue"></button>                    
-                    </li>
-                    <li>
-                        <button class="flat-btn" style="--btn-color:rgb(0, 168, 168); --btn-ring:rgb(0, 78, 78);" data-color="teal"></button>                    
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div id="RightSide">
-        <div id="earnings"></div>
-        <div id="PickUp">
-            <div id="piecesContainer">
-                <!-- <div class="box">
-                    <div class="content">📦</div>
-                </div> -->
-            </div>
-            <div style="grid-column: 1/10; grid-row: 8/10;">
-                <div class="conveyor">
-                <div class="belt"></div>
-              </div>
-            </div>
-        </div>
-    </div>
-        <div id="TerminalBar">
-            <div id="terminal">
-                <p>----Open Terminal----</p>
-                <!-- <ul>
-                    <li>/\</li>
-                    <li>/\</li>
-                    <li>/\</li>
-                </ul> -->
-            </div>
-        </div>
-    </div>
-    <script>
-        const dropZone = document.getElementById("chute");
-        const flap = document.getElementById("flap");
-        const piecesContainer = document.getElementById("piecesContainer")
-        const buttons = document.querySelectorAll(".flat-btn");
-        const terminal = document.getElementById("terminal")
-        const terminalPage = document.getElementById("terminalPage")
-        const boxInfo = document.getElementById("boxInfo")
-        const size1 = document.getElementById("size1")
-        const size2 = document.getElementById("size2")
-        const size3 = document.getElementById("size3")
-        const type1 = document.getElementById("type1")
-        const type2 = document.getElementById("type2")
-        const type3 = document.getElementById("type3")
 
-        const typeColors = {
-            normal: "red",
-            express: "yellow",
-            boat: "orange"
-        };
+<div id="score">Score: 0</div>
+<canvas id="canvas" width="500" height="400"></canvas><br>
+<button onclick="clearCanvas()">Clear</button>
 
-        const sizeColors = {
-            large: "purple",
-            medium: "lightblue",
-            small: "teal"
-        };
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-        let arr = [[size1, type1],[size2,type2],[size3,type3]]
-        let boxes = [];
-        let lastBox = 0
-        let draggedPiece = null;
-        let slot1 = ""
-        let slot2 = ""
-        let piecesCount = 0
-        let initalCounter = 0
-        let nextColor1 = null;
-        let nextColor2 = null;
-        let intialClick = false
-        function updatePieceCount(num) {
-            piecesCount = piecesCount + num
-            console.log(`PiecesCount: ${piecesCount}`)
-        }
-        function makeDraggable(piece) {
-                piece.addEventListener("dragstart", (e) => {
-                draggedPiece = piece;
-                });
-            }
-            function calculateAnimationMovement(piece){
-            elementWidth = piecesContainer.getBoundingClientRect().width
-            boxWidth = piece.getBoundingClientRect().width
-            console.log(initalCounter)
-            if(initalCounter  <= 3){
-                console.log(elementWidth)
-                console.log(boxWidth)
-                console.log("Inital counter: ",initalCounter)
-                console.log((elementWidth - (boxWidth * initalCounter)))
-                piece.animate(
-            [   
-                { transform: 'translateX(0px)' },
+let drawing = false;
+let lines = [];
+let currentLine = [];
+let lastPoint = null;
+let collisionDetected = false;
 
-                { transform: `translateX(-${(elementWidth - (boxWidth * initalCounter)  - 6)}px)` }
-            ],
-            {
-                duration: 1000,  
-                fill: 'forwards'     
-            }
-            );
-            } else{
-                console.log(elementWidth)
-                console.log(boxWidth)
-                console.log(`Last Box:${lastBox}`)
-                console.log((elementWidth - (boxWidth * lastBox)))
-                piece.animate(
-            [   
-                { transform: 'translateX(0px)' },
+let score = 0;
+let usedPoints = new Set();
 
-                { transform: `translateX(-${(elementWidth - (boxWidth * lastBox) - 6)}px)` }
-            ],
-            {
-                duration: 1000,  
-                fill: 'forwards'     
-            }
-            );
-            }
-        }   
-        function updatePositions(piece) {
-            const containerWidth = piecesContainer.getBoundingClientRect().width;
-            const boxWidth = piece.getBoundingClientRect().width || 0;
-            const gap = 10;
+// 🎨 Unique colors
+let hue = 0;
+function getUniqueColor() {
+  const color = `hsl(${hue}, 100%, 50%)`;
+  hue = (hue + 37) % 360;
+  return color;
+}
 
-            boxes.forEach((box, index) => {
-                box.style.transition = "transform 0.5s"; 
-                const x = index * (boxWidth + gap);
-                box.style.transform = `translateX(${x}px)`;
-            });
-        }
-        
-        function createRandomPiece() {
-            const types = [
-                { type: "normal", size: "large", icon: "📦" },
-                { type: "normal", size: "medium", icon: "📦" },
-                { type: "normal", size: "small", icon: "📦" },
-                { type: "express", size: "large", icon: "📦" },
-                { type: "express", size: "medium", icon: "📦" },
-                { type: "express", size: "small", icon: "📦" },
-                { type: "boat", size: "large", icon: "📦" },
-                { type: "boat", size: "medium", icon: "📦" },
-                { type: "boat", size: "small", icon: "📦" }
-            ];
+// 🔴 Start points
+const startPoints = [
+  { x: 100, y: 100 },
+  { x: 400, y: 100 },
+  { x: 100, y: 300 },
+  { x: 400, y: 300 }
+];
 
-            const choice = types[Math.floor(Math.random() * types.length)];
-            const piece = document.createElement("div"); 
-            console.log(`box ${initalCounter}:${choice}`)
-            piece.className = "box conveyorItem";
-            piece.draggable = true;
-            piece.id = `${choice.type}${choice.size}`;
-            if(initalCounter < 3){
-                console.log("INITAL")
-                piece.textContent = ++initalCounter
-                arr[initalCounter -1][0].textContent =  choice.size
-                arr[initalCounter -1][1].textContent =  choice.type
-            } else{
-                initalCounter = 4
-                arr[lastBox -1][0].textContent =  choice.size
-                arr[lastBox -1][1].textContent =  choice.type
-                piece.textContent = lastBox
-            }
-            makeDraggable(piece);
-            piecesContainer.appendChild(piece);
+function drawStartPoints() {
+  for (let p of startPoints) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "red";
+    ctx.fill();
+  }
+}
 
-            if (piecesCount < 3) {
-                updatePieceCount(1);
-            }
+// 🧠 Detect valid start/end
+function getStartPoint(x, y) {
+  const threshold = 10;
 
-            piece.style.position = "absolute";
-            piece.style.bottom = "0px";
+  for (let p of startPoints) {
+    const dx = p.x - x;
+    const dy = p.y - y;
+    if (Math.sqrt(dx * dx + dy * dy) < threshold) {
+      return p;
+    }
+  }
+  return null;
+}
 
-            calculateAnimationMovement(piece);
-        }
+// 🎯 Score
+function updateScore(points) {
+  score += points;
+  document.getElementById("score").innerText = "Score: " + score;
+}
 
-        const interval = setInterval(() => {
-            if (piecesCount < 3) {
-                createRandomPiece();
-                console.log("Spawn");
-            } else {
-                clearInterval(interval);
-            }
-        }, 2000);
-        
-        function handlePieceDropped(piece) {
-            // Example: move it into the drop zone FIRST (optional)
-            let str = `${dropZone.classList}`;            
-            if(piece.id == str.replace(/\s+/g, "")){
-            dropZone.appendChild(piece);
-            // Then remove it
-            piece.remove();
-            // Update count
-            lastBox = piece.textContent
-            updatePieceCount(-1);
-            // Your custom function
-            // onPieceDeleted(piece);
-            createRandomPiece()
-            } else{
-                alert("Incorrect box")
-            }
-        }
+// 🖱️ Start drawing
+canvas.addEventListener("mousedown", (e) => {
+  const x = e.offsetX;
+  const y = e.offsetY;
 
-        dropZone.addEventListener("dragover", (e) => {
-            e.preventDefault(); // REQUIRED
-        });
+  const startPoint = getStartPoint(x, y);
+  if (!startPoint) return;
 
-        // Handle drop
-        dropZone.addEventListener("drop", (e) => {
-            e.preventDefault();
+  drawing = true;
+  collisionDetected = false;
 
-            if (draggedPiece) {
-                handlePieceDropped(draggedPiece);
-                draggedPiece = null;
-            }
-        });
+  ctx.beginPath();
+  ctx.moveTo(startPoint.x, startPoint.y);
 
-        // function fillConveyor(){
-        //     if(piecesCount < 3){
-        //         createRandomPiece()
-        //     }
-        // }
-        // setInterval(fillConveyor, 2000);
-        createRandomPiece()
+  currentLine = [];
+  lastPoint = { x: startPoint.x, y: startPoint.y };
 
-        function handleButtonClick(e) {
-            const button = e.target;
-            const color = button.dataset.color;
+  ctx.strokeStyle = getUniqueColor();
+});
 
-            if(color == "red") slot1 = "normal";
-            if(color == "yellow") slot1 = "express";
-            if(color == "orange") slot1 = "boat";
+// ✏️ Drawing
+canvas.addEventListener("mousemove", (e) => {
+  if (!drawing) return;
 
-            if(color == "purple") slot2 = "large";
-            if(color == "lightblue") slot2 = "medium";
-            if(color == "teal") slot2 = "small";
+  const x = e.offsetX;
+  const y = e.offsetY;
+  const newPoint = { x, y };
 
-            dropZone.classList = `${slot1} ${slot2}`;
+  const segment = { p1: lastPoint, p2: newPoint };
+  currentLine.push(segment);
 
-            // store colors (DO NOT APPLY YET)
-            if (slot1) nextColor1 = typeColors[slot1];
-            if (slot2) nextColor2 = sizeColors[slot2];
-        }
+  checkCollision(segment);
 
-        buttons.forEach(btn => {
-            btn.addEventListener("click", (e) => {
-                handleButtonClick(e)
-                if (slot1 !="" && slot2 !="" & intialClick){
-                    flap.classList.remove("opening");
-                    flap.classList.add("closing");
-                    console.log("phase 2")
-                    setTimeout(() => {
-                        if (nextColor1) dropZone.style.setProperty("--color1", nextColor1);
-                        if (nextColor2) dropZone.style.setProperty("--color2", nextColor2);
-                    }, 150);
-                    setTimeout(() => {
-                        flap.classList.remove("closing");
-                        flap.classList.add("opening");
-                    }, 500);
-                } else if(slot1 !="" && slot2 !=""){
-                    console.log("Phase 1")
-                    setTimeout(() => {
-                        if (nextColor1) dropZone.style.setProperty("--color1", nextColor1);
-                        if (nextColor2) dropZone.style.setProperty("--color2", nextColor2);
-                    }, 100);
-                    setTimeout(() => {
-                        flap.classList.add("opening");
-                    }, 500);
-                    intialClick = true
-                }
-            });
-        });
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
 
-        function openTerminal(){
-            terminalPage.style.display = "inline"
-        }
-        function closeTerminal(){
-            terminalPage.style.display = "none"
-        }
+  ctx.lineTo(x, y);
+  ctx.stroke();
 
-        terminal.addEventListener("mouseover", openTerminal)
-        terminal.addEventListener("mouseout", closeTerminal)
-    </script>
+  lastPoint = newPoint;
+});
+
+// 🧼 End drawing
+canvas.addEventListener("mouseup", (e) => {
+  if (!drawing) return;
+
+  drawing = false;
+  ctx.beginPath();
+
+  const x = e.offsetX;
+  const y = e.offsetY;
+  const endPoint = getStartPoint(x, y);
+
+  if (currentLine.length > 0) {
+    lines.push({
+      segments: currentLine,
+      color: ctx.strokeStyle
+    });
+
+    // 🎯 Scoring
+    if (endPoint) {
+      const key = `${endPoint.x},${endPoint.y}`;
+      if (!usedPoints.has(key)) {
+        usedPoints.add(key);
+        updateScore(10);
+      }
+    }
+  }
+});
+
+// 💥 Collision detection
+function checkCollision(newSeg) {
+  if (collisionDetected) return;
+
+  for (let line of lines) {
+    for (let seg of line.segments) {
+      if (segmentsIntersect(newSeg, seg)) {
+        collisionDetected = true;
+        alert("⚡ Lines touched!");
+        return;
+      }
+    }
+  }
+}
+
+// 📐 Line intersection math
+function segmentsIntersect(s1, s2) {
+  const A = s1.p1, B = s1.p2;
+  const C = s2.p1, D = s2.p2;
+
+  function ccw(P, Q, R) {
+    return (R.y - P.y) * (Q.x - P.x) > (Q.y - P.y) * (R.x - P.x);
+  }
+
+  return (
+    ccw(A, C, D) !== ccw(B, C, D) &&
+    ccw(A, B, C) !== ccw(A, B, D)
+  );
+}
+
+// 🔁 Redraw
+function redrawCanvas() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  for (let line of lines) {
+    ctx.beginPath();
+    ctx.strokeStyle = line.color;
+
+    for (let seg of line.segments) {
+      ctx.moveTo(seg.p1.x, seg.p1.y);
+      ctx.lineTo(seg.p2.x, seg.p2.y);
+    }
+
+    ctx.stroke();
+  }
+
+  drawStartPoints();
+}
+
+// 🧼 Clear
+function clearCanvas() {
+  lines = [];
+  usedPoints.clear();
+  score = 0;
+  updateScore(0);
+  redrawCanvas();
+}
+
+// 🟢 Init
+drawStartPoints();
+</script>
+
 </body>
 </html>
-<!-- Two Weeks -->
