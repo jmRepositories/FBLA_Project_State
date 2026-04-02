@@ -6,116 +6,203 @@
     <style>
       * {
         box-sizing: border-box;
-      }
-      html,
-      body {
         margin: 0;
         padding: 0;
-        height: 100%;
-        overflow: hidden;
-      }
-      #container {
-        display: grid;
-        grid-template-rows: repeat(7, 1fr);
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        border: 3px solid gray;
-        height: inherit;
-        background:
-          linear-gradient(180deg, #a0a0a0, #7d7d7d),
-          repeating-linear-gradient(
-            45deg,
-            rgba(255, 255, 255, 0.05) 0px,
-            rgba(255, 255, 255, 0.05) 2px,
-            transparent 2px,
-            transparent 6px
-          );
+        font-family: Arial, sans-serif;
       }
 
-      #header {
-        width: 100%;
-        height: 60%;
-        border: 3px solid black;
-        background-color: cornflowerblue;
-        grid-column: 1/3;
-        grid-row: 1/1;
+      body {
+        background: linear-gradient(180deg, #0f172a, #1e293b);
+        color: white;
+      }
+
+      /* NAVBAR */
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 40px;
+        background: #020617;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      }
+
+      .navbar-left {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 10px;
-        opacity: 100;
       }
-      #header img {
-        max-height: 100%;
-        max-width: 100px;
-        object-fit: contain;
+
+      .navbar img {
+        height: 40px;
+        cursor: pointer;
       }
-      #text {
-        grid-row: 2;
-        grid-column: 1/3;
-        margin-left: 100px;
-        margin-right: 100px;
-        /* border: 3px solid red; */
+
+      .navbar h2 {
+        font-size: 1.5rem;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 20px;
+      }
+
+      .nav-links a {
+        text-decoration: none;
+        color: #cbd5f5;
+        transition: 0.2s;
+      }
+
+      .nav-links a:hover {
+        color: white;
+      }
+
+      /* HERO SECTION */
+      .hero {
+        text-align: center;
+        padding: 60px 20px 30px;
+      }
+
+      .hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      .hero p {
+        color: #cbd5f5;
+        max-width: 600px;
+        margin: auto;
+      }
+
+      /* GAME CARDS */
+      .games {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        padding: 40px;
+        flex-wrap: wrap;
+      }
+
+      .card {
+        background: #1e293b;
+        border-radius: 16px;
+        width: 260px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.25s ease;
+        cursor: pointer;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      }
+
+      .card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+        background: #334155;
+      }
+
+      .card-content {
+        padding: 20px;
         text-align: center;
       }
-      #selection {
-        grid-row: 3/7;
-        grid-column: 1/3;
-        /* border: 3px solid red; */
-        display: flex;
-        align-items: center;
-        justify-content: space-evenly;
+
+      .card-content h3 {
+        margin-bottom: 10px;
       }
-      #selection div {
-        background-color: cornflowerblue;
-        width: 20%;
-        border: 3px solid black;
-        height: 250px;
+
+      .card-content p {
+        font-size: 0.9rem;
+        color: #cbd5f5;
+      }
+
+      /* FOOTER */
+      .footer {
+        text-align: center;
+        padding: 20px;
+        color: #94a3b8;
+        font-size: 0.8rem;
       }
     </style>
   </head>
+
   <body>
-    <div id="container">
-      <div id="header">
+    <!-- NAVBAR -->
+    <div class="navbar">
+      <div class="navbar-left">
         <img
           src="https://cdn.pixabay.com/photo/2014/04/03/00/38/house-308936_1280.png"
-          alt="Home Page"
           onclick="goHome()"
         />
         <h2>Amazook</h2>
-        <!-- <p>Current game: <span>None</span></p> -->
       </div>
-      <div id="text">
-        Lorem, ipsum dolor sit amet consectetur adipisicing elit. Repudiandae
-        nobis rerum, deleniti, quos quibusdam totam exercitationem aut, impedit
-        illum minus corporis dolores! Vero iusto ipsa, et asperiores eligendi
-        nisi non saepe tempore aspernatur obcaecati! Tempora ipsam ab placeat
-        excepturi accusamus, aliquam id commodi quibusdam totam unde quod? Eius
-        expedita eligendi eum quod odit quia, atque unde, deserunt dolorem animi
-        inventore reprehenderit illo iusto tempore quae enim. Eum in
-        voluptatibus, perspiciatis mollitia quisquam vero quia quod, libero
-        facere alias reiciendis explicabo necessitatibus quasi culpa fugiat et
-        earum, esse ab! Deleniti corporis mollitia eveniet deserunt fugiat nisi
-        quia officiis, libero placeat optio.
-      </div>
-      <div id="selection">
-        <div onclick="packagingGame()"></div>
-        <div onclick="shipmentGame()"></div>
-        <div onclick="cashierGame()"></div>
+
+      <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Games</a>
+        <a href="#">About</a>
       </div>
     </div>
+
+    <!-- HERO -->
+    <div class="hero">
+      <h1>Welcome to Amazook</h1>
+      <p>
+        Train your skills through fun, fast-paced mini games inspired by
+        real-world tasks. Choose a game below and start playing!
+      </p>
+    </div>
+
+    <!-- GAME SELECTION -->
+    <div class="games">
+      <div class="card" onclick="packagingGame()">
+        <img src="packaging.png" alt="Packaging Game" />
+        <div class="card-content">
+          <h3>Packaging Game</h3>
+          <p>
+            Sort and match packages quickly to keep the system running smoothly.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" onclick="shipmentGame()">
+        <img src="shipment.png" alt="Shipment Game" />
+        <div class="card-content">
+          <h3>Shipment Game</h3>
+          <p>
+            Manage logistics and send shipments to the correct destinations.
+          </p>
+        </div>
+      </div>
+
+      <div class="card" onclick="cashierGame()">
+        <img src="cashier.png" alt="Cashier Game" />
+        <div class="card-content">
+          <h3>Cashier Game</h3>
+          <p>Handle transactions quickly and accurately under pressure.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">© 2026 Amazook. All rights reserved.</div>
+
     <script>
       function shipmentGame() {
-        window.location.href = "shipment.html"; // Go to game page
+        window.location.href = "shipment.html";
       }
       function packagingGame() {
-        window.location.href = "packaging.html"; // Go to game page
+        window.location.href = "packaging.html";
       }
       function cashierGame() {
-        window.location.href = "cashier.html"; // Go to game page
+        window.location.href = "cashier.html";
       }
       function goHome() {
-        window.location.href = "index.html"; // Go home (reload current page)
+        window.location.href = "index.html";
       }
     </script>
   </body>
