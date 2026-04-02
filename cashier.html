@@ -1,1 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cashier</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div>
+      <h1 id="nav">
+        Count Customer's Change! (Put nav information here)
+        <!-- Cashier | Phase: <span id="phase"></p> <!--3 phases: scan items, count change, receipt, this should change based on the phase and listen for events to change the text here
+        -->
+      </h1>
+      <!-- <div id="sceneBox"> -->
+      <div>
+        <img id="imgBox" src="images/countMoney.png" />
+      </div>
 
+      <div id="receipt">
+        <div class="notification" style="opacity: 1">
+          <h3>Customer Items</h3>
+          <hr class="thick-line" />
+          <ul id="receipt-list">
+            <!-- ${itemListHTML} -->
+          </ul>
+          <hr class="thick-line" />
+          <p><strong>Total:</strong> <span id="customerTotal"></span></p>
+          <p>
+            <strong>Customer pays:</strong>
+            <span id="roundedCustomerTotal"></span>
+          </p>
+
+          <label>
+            
+            Enter change:
+            <input id="changeInput" type="number" step="0.01" />
+          </label>
+
+          <button id="submitChange" onclick="checkChange(change)">
+            Submit
+          </button>
+
+          <p id="changeFeedback"></p>
+
+          <button id="nextCustomer" onclick="NewCustomer()">
+            Next Customer
+          </button>
+        </div>
+      </div>
+    </div>
+    <script src="js/countMoney.js"></script>
+  </body>
+</html>
