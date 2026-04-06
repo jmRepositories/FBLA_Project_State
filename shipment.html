@@ -16,139 +16,181 @@
         overflow: hidden;
       }
       #container {
-        width: 100%;
-        border: 3px solid gray;
-        background:
-          linear-gradient(180deg, #a0a0a0, #7d7d7d),
-          repeating-linear-gradient(
-            45deg,
-            rgba(255, 255, 255, 0.05) 0px,
-            rgba(255, 255, 255, 0.05) 2px,
-            transparent 2px,
-            transparent 6px
-          );
-      }
-      body {
-        text-align: center;
-        font-family: Arial;
-        width: 100%;
-      }
+  position: relative; /* IMPORTANT */
+  height: 100%;
+}
+      #gameLayout {
+  display: flex;
+  height: calc(100% - 8%);
+}
 
-      canvas {
-        border: 2px solid cornflowerblue;
-        background: white;
-        cursor: crosshair;
-      }
+/* Sidebar */
+#sidebar {
+  width: 220px;
+  background: #0f172a;
+  color: #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 20px;
 
-      #score,
-      #timer,
-      #level {
-        font-size: 20px;
-        margin: 10px;
-      }
+  border-right: 3px solid #1e293b;
+}
 
-      button {
-        padding: 8px 12px;
-        margin: 5px;
-        cursor: pointer;
-        background-color: cornflowerblue;
-      }
+.stat {
+  font-size: 20px;
+  background: #1e293b;
+  padding: 12px 20px;
+  border-radius: 10px;
+  width: 100%;
+  text-align: center;
 
-      #header {
-        width: 100%;
-        height: 60%;
-        border: 3px solid black;
-        background-color: cornflowerblue;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 10px;
-        opacity: 100;
-        margin: 0 auto;
-      }
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.4);
+}
 
-      #header img {
-        max-height: 100%;
-        max-width: 80px;
-        object-fit: contain;
-      }
+/* Canvas Area */
+#canvasArea {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle, #cbd5f5, #94a3b8);
+}
 
-      #levelOverlay{
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.75);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        pointer-events: none;
-      }
+/* Canvas styling upgrade */
+canvas {
+  border: 4px solid #1e293b;
+  border-radius: 12px;
+  background: white;
 
-      #levelMessage{
-        padding: 40px 70px;
-        font-size: 42px;
-        font-weight: bold;
-        border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
 
-        background: linear-gradient(135deg, #4facfe, #00f2fe);
-        color: white;
+/* Header improvements */
+#header {
+  height: 8%;
+  background: #020617;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  color: #cbd5f5;
+}
 
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.7),
-        0 0 40px rgba(0, 255, 255, 0.5);
+#header .left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-        transform: scale(0.5);
-        text-align: center;
-      }
+#header img {
+  width: 40px;
+  cursor: pointer;
+}
 
-      .showOverlay{
-        animation: fadeIn 0.5s forwards;
-      }
+/* Button upgrade */
+button {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  color: white;
+  font-weight: bold;
+  transition: 0.2s;
+}
 
-      .showOverlay #levelMessage{
-        animation: popIn 0.5s forwards;
-      }
+button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+#levelOverlay {
+  position: absolute;
+  inset: 0; /* shorthand for top:0, left:0, right:0, bottom:0 */
 
-      @keyframes fadeIn{
-        to{
-          opacity: 1;
-        }
-      }
+  background: rgba(0, 0, 0, 0.75);
 
-      @keyframes popIn{
-        to{
-          transform: scale(1);
-        }
-      }
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  pointer-events: none;
+
+  z-index: 1000; /* ensure it sits above everything */
+}
+#levelMessage {
+  padding: 40px 70px;
+  font-size: 42px;
+  font-weight: bold;
+  border-radius: 15px;
+
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
+
+  box-shadow:
+    0 0 20px rgba(0, 0, 0, 0.7),
+    0 0 40px rgba(0, 255, 255, 0.5);
+
+  transform: scale(0.7);
+  opacity: 0;
+}
+
+.showOverlay {
+  animation: fadeIn 0.3s forwards;
+}
+
+.showOverlay #levelMessage {
+  animation: popIn 0.4s forwards;
+}
+
+@keyframes popIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
     </style>
   </head>
 
   <body>
     <div id="container">
-      <div id="header">
-        <img
-          src="https://cdn.pixabay.com/photo/2014/04/03/00/38/house-308936_1280.png"
-          alt="Home Page"
-          onclick="goHome()"
-        />
-        <h2>Amazook</h2>
-        <p>Current game: <span>Packaging</span></p>
+        <div id="header">
+          <div class="left">
+            <img
+              src="https://cdn.pixabay.com/photo/2014/04/03/00/38/house-308936_1280.png"
+              onclick="goHome()"
+            />
+            <h2>Amazook</h2>
+          </div>
+      
+          <div class="right">
+            <span>Game: Shipment</span>
+          </div>
+        </div>
+      
+        <div id="gameLayout">
+          <!-- Sidebar -->
+          <div id="sidebar">
+            <div class="stat" id="level">Level: 1</div>
+            <div class="stat" id="score">Score: 0</div>
+            <div class="stat" id="timer">Time: 60</div>
+            <button onclick="startGame()">Start</button>
+            <button onclick="pauseGame()">Pause</button>
+      
+            <button onclick="clearCanvas()">Restart</button>
+          </div>
+      
+          <!-- Canvas Area -->
+          <div id="canvasArea">
+            <canvas id="canvas" width="700" height="600"></canvas>
+          </div>
+        </div>
+      
+        <div id="levelOverlay">
+          <div id="levelMessage">Level Complete!</div>
+        </div>
       </div>
-
-      <div id="level">Level: 1</div>
-      <div id="score">Score: 0</div>
-      <div id="timer">Time: 60</div>
-
-      <canvas id="canvas" width="700" height="600"></canvas><br />
-
-      <div id="levelOverlay">
-        <div id="levelMessage">Level Complete!</div>
-      </div>
-
-      <button onclick="clearCanvas()">Restart</button>
-    </div>
     <script>
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
@@ -158,7 +200,7 @@
       let currentLine = [];
       let lastPoint = null;
       let collisionDetected = false;
-
+      let gameRunning = false;
       let score = 0;
       let usedPoints = new Set();
 
@@ -177,6 +219,9 @@
         return color;
       }
 
+      function goHome() {
+        window.location.href = "index.html"; // Go home (reload current page)
+      }
       // Generate paired points
       function generateStartPoints(pairCount) {
         const points = [];
@@ -259,22 +304,43 @@
       function startTimer() {
         clearInterval(timerInterval);
         timeLeft = 60;
-        document.getElementById("timer").innerText = "Time: " + timeLeft;
+        updateTimerDisplay();
 
         timerInterval = setInterval(() => {
-          timeLeft--;
-          document.getElementById("timer").innerText = "Time: " + timeLeft;
+            if (!gameRunning) return;
 
-          if (timeLeft <= 0) {
+            timeLeft--;
+            updateTimerDisplay();
+
+            if (timeLeft <= 0) {
             clearInterval(timerInterval);
             alert("⏰ Time's up!");
-          }
+            }
         }, 1000);
-      }
+        }
+
+        function updateTimerDisplay() {
+        document.getElementById("timer").innerText = "Time: " + timeLeft;
+        }
+
+        function startGame() {
+        if (gameRunning) return;
+
+        gameRunning = true;
+
+        // only start timer if it's not already running
+        if (!timerInterval) {
+            startTimer();
+        }
+        }
+
+        function pauseGame() {
+        gameRunning = false;
+        }
 
       // Start drawing
       canvas.addEventListener("mousedown", (e) => {
-        if (timeLeft <= 0) return;
+        if (!gameRunning || timeLeft <= 0) return;
 
         const startPoint = getStartPoint(e.offsetX, e.offsetY);
         if (!startPoint) return;
@@ -295,7 +361,7 @@
 
       // Drawing
       canvas.addEventListener("mousemove", (e) => {
-        if (!drawing || timeLeft <= 0) return;
+        if (!drawing || !gameRunning || timeLeft <= 0) return;
 
         const newPoint = { x: e.offsetX, y: e.offsetY };
         const segment = { p1: lastPoint, p2: newPoint };
@@ -431,13 +497,19 @@
         hue = 0;
         startPoints = generateStartPoints(pairCount);
         redrawCanvas();
-        startTimer();
-      }
+
+        gameRunning = false;
+        clearInterval(timerInterval);
+        timerInterval = null;
+
+        timeLeft = 60;
+        document.getElementById("timer").innerText = "Time: 60";
+        }
 
       // Init
       startPoints = generateStartPoints(pairCount);
       drawStartPoints();
-      startTimer();
+    //   startTimer();
     </script>
   </body>
 </html>
