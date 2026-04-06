@@ -191,6 +191,190 @@
       }
     </script> -->
     <script>
+      const shoppingCart = [
+  {
+    product: "Apple",
+    price: 1.56,
+    imageUrl: "images/apple.png",
+  },
+  {
+    product: "Gum",
+    price: 0.99,
+    imageUrl: "images/gum.png",
+  },
+  {
+    product: "Water Bottle",
+    price: 1.89,
+    imageUrl: "images/waterBottle.png",
+  },
+  {
+    product: "Bananas",
+    price: 5.99,
+    imageUrl: "images/bananas.png",
+  },
+  {
+    product: "Chips",
+    price: 6.82,
+    imageUrl: "images/chips.png",
+  },
+  {
+    product: "Tissue Box",
+    price: 3.34,
+    imageUrl: "images/tissueBox.png",
+  },
+  {
+    product: "Monster Energy Drink",
+    price: 2.25,
+    imageUrl: "images/monsterEnergyDrink.png",
+  },
+  {
+    product: "Candy", //here
+    price: 1.99,
+    imageUrl: "images/candy.png",
+  },
+  {
+    product: "Vitamins",
+    price: 24.99,
+    imageUrl: "images/vitamins.png",
+  },
+  {
+    product: "Lotion",
+    price: 14.99,
+    imageUrl: "images/lotion.png",
+  },
+]; //array of available items that can be picked from
+
+
+
+function itemAmount() { //item amount that is randomly generated can only be from 0 to 5
+    return Math.floor(Math.random() * 6); //gets random number 0-5
+}
+
+
+
+
+function generateCustomerCart(cart) { //Assign random amount to items and remove 0 item amounts
+    return cart
+        .map(item => ({
+            ...item, //spread operator to copy the array values of each item on the list
+            amount: itemAmount() //run itemAmount function to add an amount to each item in the array
+        }))
+        .filter(item => item.amount > 0); //if the item is below 0 don't include it in the cart and filter it out
+}
+
+
+let customerCart = generateCustomerCart(shoppingCart); //result
+console.log(customerCart); //shows all items in the cart in the console
+
+//counts total price
+function countTotal(cart) {
+    return cart.reduce((total, item) => {
+        return total + item.price * item.amount;
+    }, 0);
+}
+
+//Customer rounds up & user gives change
+function roundUpTotal(total) {
+    return Math.ceil(total);
+}
+
+
+function calculateChange(roundedTotal, actualTotal) {
+    return (roundedTotal - actualTotal).toFixed(2);
+}
+
+// render the receipt in the notifyBox
+let receiptList = document.getElementById('receipt-list');
+let customerTotal = document.getElementById('customerTotal');
+let roundedCustomerTotal = document.getElementById('roundedCustomerTotal');
+
+function setReceipt() {
+  console.log("set", customerCart)
+  const itemListHTML = customerCart.map((item) => `
+  <li>
+    ${item.product} × ${item.amount}
+    <span>$${(item.price * item.amount).toFixed(2)}</span>
+  </li>
+`).join("");
+
+
+let total = countTotal(customerCart);
+let roundedTotal = roundUpTotal(total);
+
+
+    receiptList.innerHTML = itemListHTML;
+    customerTotal.innerHTML = `$${total.toFixed(2)} `;
+    roundedCustomerTotal.innerHTML = `$${roundedTotal}`;
+    change = calculateChange(roundedTotal, total); //By not defining change it becomes a global variable that can be used in the checkChange function
+      console.log(`Customer pays: $${roundedTotal}`);
+      console.log(`Change due: $${change}`);
+}
+
+
+
+
+// for testing
+function msgTest() {
+  console.log("nothing for now");
+}
+
+
+let completedCustomer = false;
+
+
+function NewCustomer() {
+  if (completedCustomer == true) {
+    customerCart = generateCustomerCart(shoppingCart);
+    setReceipt(customerCart)
+    feedback.textContent = '';
+    completedCustomer = false;
+  }
+   else {
+    console.log('Help this customer first!')
+    feedback.textContent = 'Help this customer first!';
+    feedback.style.color = 'black';
+  }
+}
+
+
+//check if the inputted change amount is right
+// CHECK CHANGE FUNCTION
+function checkChange(correctChange) {
+    const input = document.getElementById('changeInput');
+   feedback = document.getElementById('changeFeedback');
+    const userValue = parseFloat(input.value);
+
+    if (isNaN(userValue)) {
+        feedback.textContent = 'Enter a valid number.';
+        feedback.style.color = 'orange';
+        return;
+    }
+
+
+    if (Math.abs(userValue - correctChange) < 0.01) {
+        feedback.textContent = 'Good Job!';
+        feedback.style.color = 'green';
+      completedCustomer = true;
+    } else {
+        feedback.textContent = 'Try again!';
+        feedback.style.color = 'red';
+    }
+}
+
+//I PUT THIS INSIDE SETRECEIPT
+//   let itemListHTML = customerCart.map((item) => `
+//   <li>
+//       ${item.product} × ${item.amount}
+//       <span>$${(item.price * item.amount).toFixed(2)}</span>
+//   </li>
+//   `,).join("");
+
+
+// // Switch phase text N/A
+//document.getElementById('phase').textContent = 'Count Change';
+
+
+setReceipt()
         function goHome() {
         window.location.href = "index.html"; // Go home (reload current page)
       }
